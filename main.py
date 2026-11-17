@@ -36,7 +36,7 @@ from affiliate_data_structure import (
 )
 # Datos y colores de la aplicación
 AUTHOR = "Jhon Deivid Rojas Rodriguez"
-GROUP_NUMBER = "298"
+GROUP_NUMBER = "301305_298"
 COURSE = "Estructura de Datos (301305-16-04)"
 PROGRAM = "Ingeniería de Sistemas"
 UNIVERSITY = "Universidad Nacional Abierta y a Distancia - UNAD"

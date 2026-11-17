@@ -1,5 +1,7 @@
 # Fase 3 — Prácticas simuladas
 
+Estudiante: Jhon Deivid Rojas Rodriguez. Grupo: 301305_298.
+
 Aplicación de escritorio en Python para registrar afiliados de la Caja Compensándote y practicar tres estructuras lineales: pila, cola y lista. La interfaz permite elegir la estructura activa, registrar afiliados, consultar su reporte y retirar registros según las reglas de cada estructura.
 
 ## Ejecutar

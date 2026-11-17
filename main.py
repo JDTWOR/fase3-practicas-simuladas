@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-import os
 import sys
 import tkinter as tk
 from tkinter import font as tkfont
@@ -60,9 +59,6 @@ DANGER = "#B23A48"
 DANGER_DARK = "#8E2C38"
 SUCCESS = "#1E7A4F"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGO_PATH = os.path.join(BASE_DIR, "assets", "logo_compensandote.png")
-
 FONT = "Segoe UI"
 
 try:  # tkcalendar is optional; the application falls back to three Spinboxes.
@@ -93,17 +89,6 @@ def center_window(window: tk.Misc, width: int, height: int) -> None:
     y = max(0, (screen_height - height) // 2)
     window.geometry(f"{width}x{height}+{x}+{y}")
 
-
-def create_badge(parent: tk.Misc, size: int = 44, background: str = NAVY, oval: str = GOLD,
-                 letter: str = "C", letter_color: str = NAVY) -> tk.Canvas:
-    """Draw the small circular brand mark used in the headers."""
-    canvas = tk.Canvas(parent, width=size, height=size, bg=background,
-                       highlightthickness=0, bd=0)
-    canvas.create_oval(2, 2, size - 2, size - 2, fill=oval, outline="")
-    canvas.create_text(size / 2, size / 2 + 1, text=letter,
-                       fill=letter_color, font=(FONT, int(size * 0.42), "bold"))
-    return canvas
-# Campo de fecha
 
 
 class AffiliationDateField(tk.Frame):
@@ -196,10 +181,8 @@ class AboutDialog(tk.Toplevel):
         header = tk.Frame(self, bg=NAVY, height=118)
         header.pack(fill="x")
         header.pack_propagate(False)
-        badge = create_badge(header, 58, NAVY, GOLD, "C", NAVY)
-        badge.pack(side="left", padx=(28, 14), pady=30)
         titles = tk.Frame(header, bg=NAVY)
-        titles.pack(side="left", pady=28)
+        titles.pack(side="left", padx=28, pady=28)
         tk.Label(titles, text="Acerca de la aplicación", bg=NAVY, fg="white",
                  font=(FONT, 16, "bold")).pack(anchor="w")
         tk.Label(titles, text="Caja Compensándote · Control de Afiliados", bg=NAVY,
@@ -269,9 +252,8 @@ class LoginView(tk.Frame):
 
         brand = tk.Frame(content, bg=NAVY)
         brand.pack(anchor="w")
-        create_badge(brand, 42, NAVY, GOLD, "C", NAVY).pack(side="left")
         brand_text = tk.Frame(brand, bg=NAVY)
-        brand_text.pack(side="left", padx=(12, 0))
+        brand_text.pack(side="left")
         tk.Label(brand_text, text="COMPENSÁNDOTE", bg=NAVY, fg="white",
                  font=(FONT, 13, "bold")).pack(anchor="w")
         tk.Label(brand_text, text="CAJA DE COMPENSACIÓN FAMILIAR", bg=NAVY,
@@ -456,9 +438,8 @@ class MainView(tk.Frame):
 
         left = tk.Frame(header, bg=NAVY)
         left.pack(side="left", padx=20, pady=13)
-        create_badge(left, 44, NAVY, GOLD, "C", NAVY).pack(side="left")
         titles = tk.Frame(left, bg=NAVY)
-        titles.pack(side="left", padx=(12, 0))
+        titles.pack(side="left")
         tk.Label(titles, text="Control de Afiliados", bg=NAVY, fg="white",
                  font=(FONT, 16, "bold")).pack(anchor="w")
         tk.Label(titles, text="Caja Compensándote · Afiliación y beneficios",
@@ -919,22 +900,10 @@ class CompensandoteApp:
         self.login_frame: LoginView | None = None
         self.main_view: MainView | None = None
         self.about_dialog: AboutDialog | None = None
-        self._icon: tk.PhotoImage | None = None
-
-        self._load_icon()
         self._configure_styles()
         self._build_menu()
         self.root.protocol("WM_DELETE_WINDOW", self.exit_app)
         self.show_login()
-
-    def _load_icon(self) -> None:
-        if not os.path.exists(LOGO_PATH):
-            return
-        try:
-            self._icon = tk.PhotoImage(file=LOGO_PATH)
-            self.root.iconphoto(True, self._icon)
-        except tk.TclError:
-            self._icon = None
 
     def _configure_styles(self) -> None:
         style = ttk.Style(self.root)

@@ -1,18 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Caja Compensandote - Affiliate control (graphical interface).
-
-Phase 3 - Practical component - Simulated practices
-Course: Data Structures (301305-16-04) - UNAD
-Collaborative group: 298
-Author: Jhon Deivid Rojas Rodriguez
-
-Run with:
-    python main.py
-
-The application keeps every record in main memory.  It does not use
-databases or files, as required by Annex 2.
-"""
+"""Interfaz para el registro de afiliados de Caja Compensándote."""
 
 from __future__ import annotations
 
@@ -48,10 +34,7 @@ from affiliate_data_structure import (
     validate_full_name,
     validate_identification_number,
 )
-
-# ---------------------------------------------------------------------------
-# Author, course and visual identity
-# ---------------------------------------------------------------------------
+# Datos y colores de la aplicación
 AUTHOR = "Jhon Deivid Rojas Rodriguez"
 GROUP_NUMBER = "298"
 COURSE = "Estructura de Datos (301305-16-04)"
@@ -120,11 +103,9 @@ def create_badge(parent: tk.Misc, size: int = 44, background: str = NAVY, oval: 
     canvas.create_text(size / 2, size / 2 + 1, text=letter,
                        fill=letter_color, font=(FONT, int(size * 0.42), "bold"))
     return canvas
+# Campo de fecha
 
 
-# ---------------------------------------------------------------------------
-# Date control
-# ---------------------------------------------------------------------------
 class AffiliationDateField(tk.Frame):
     """Date control showing dd/mm/yyyy.
 
@@ -197,11 +178,9 @@ class AffiliationDateField(tk.Frame):
             self.day_var.set(f"{value.day:02d}")
             self.month_var.set(f"{value.month:02d}")
             self.year_var.set(str(value.year))
+# Información del estudiante
 
 
-# ---------------------------------------------------------------------------
-# About dialog
-# ---------------------------------------------------------------------------
 class AboutDialog(tk.Toplevel):
     """Small dialog with the course, author and group information."""
 
@@ -260,11 +239,9 @@ class AboutDialog(tk.Toplevel):
         center_window(self, 500, 500)
         self.grab_set()
         self.after(80, self.focus_force)
+# Ventana de acceso
 
 
-# ---------------------------------------------------------------------------
-# Login view
-# ---------------------------------------------------------------------------
 class LoginView(tk.Frame):
     """Access screen with masked password and the Acerca de / Salir buttons."""
 
@@ -405,11 +382,9 @@ class LoginView(tk.Frame):
         self.password_entry.selection_range(0, "end")
         self.password_entry.focus_set()
         self.bell()
+# Ventana de registro
 
 
-# ---------------------------------------------------------------------------
-# Main view
-# ---------------------------------------------------------------------------
 class MainView(tk.Frame):
     """Registration form, Treeview and the three linear data structures."""
 
@@ -458,7 +433,6 @@ class MainView(tk.Frame):
         self._attach_traces()
         self.refresh_view(initial=True)
 
-    # -- Layout ---------------------------------------------------------------
     def _build(self) -> None:
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -697,7 +671,6 @@ class MainView(tk.Frame):
         ttk.Button(buttons, text="Salir", style="Ghost.TButton",
                    command=self.app.exit_app).pack(side="left", padx=4)
 
-    # -- Field helpers --------------------------------------------------------
     @staticmethod
     def _validate_digits(value: str) -> bool:
         return value == "" or value.isdigit()
@@ -714,7 +687,6 @@ class MainView(tk.Frame):
             row=row, column=column, columnspan=columnspan, sticky="w",
             pady=(5, 2))
 
-    # -- State ----------------------------------------------------------------
     def _attach_traces(self) -> None:
         self.income_var.trace_add("write", lambda *_: self.update_fee())
         self.service_var.trace_add("write", lambda *_: self.update_fee())
@@ -789,7 +761,6 @@ class MainView(tk.Frame):
         self.report_widget.insert("1.0", text)
         self.report_widget.configure(state="disabled")
 
-    # -- Actions --------------------------------------------------------------
     def register_affiliate(self) -> None:
         structure = self.selected_structure()
         try:
@@ -920,7 +891,6 @@ class MainView(tk.Frame):
             f"Registro de {removed.full_name} eliminado de la {label.lower()}.", "success"
         )
 
-    # -- Feedback -------------------------------------------------------------
     def set_status(self, message: str, kind: str = "info") -> None:
         colors = {"info": TEAL, "success": SUCCESS, "error": DANGER}
         self.status_var.set(message)
@@ -930,11 +900,9 @@ class MainView(tk.Frame):
     def show_error(self, message: str) -> None:
         self.set_status(message, "error")
         messagebox.showerror("Validación de datos", message, parent=self.root)
+# Ventana principal
 
 
-# ---------------------------------------------------------------------------
-# Application controller
-# ---------------------------------------------------------------------------
 class CompensandoteApp:
     """Own the Tk root, the domain model and the two screens."""
 

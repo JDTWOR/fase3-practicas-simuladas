@@ -26,9 +26,6 @@ La aplicación calcula la cuota a partir del rango de ingresos, la modalidad lab
 - `main.py`: interfaz y manejo de eventos.
 - `affiliate_data_structure.py`: afiliados, validaciones, estructuras y reportes.
 - `test_affiliate_data_structure.py` y `test_gui_smoke.py`: comprobaciones incluidas con el proyecto.
-- `docs/abstraccion/abstraccion-fase3.md`: tabla de abstracción en formato Markdown.
 - `assets/logo_compensandote.png`: logo de la aplicación.
-
-Este repositorio no incluye la guía de la actividad, capturas ni la plantilla gráfica institucional.
 
 La clave del formulario es un valor fijo de demostración definido en el código; no es autenticación real ni debe reutilizarse en otros servicios.

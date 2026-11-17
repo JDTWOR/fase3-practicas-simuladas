@@ -1,17 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Caja Compensandote - Affiliate data structures (business logic).
-
-Phase 3 - Practical component - Simulated practices
-Course: Data Structures (301305-16-04) - UNAD
-Collaborative group: 298
-Author: Jhon Deivid Rojas Rodriguez
-
-This module is intentionally independent from Tkinter.  It contains the
-domain model (Affiliate), the three linear data structures required by the
-assignment (stack, queue and list) and every calculation or validation rule.
-Keeping the logic isolated makes it testable and reusable by the GUI.
-"""
+"""Afiliados, tarifas y estructuras de datos de Caja Compensándote."""
 
 from __future__ import annotations
 
@@ -21,10 +8,7 @@ from datetime import date, datetime
 import hmac
 import re
 from typing import Iterable
-
-# ---------------------------------------------------------------------------
-# Domain constants (internal values are in English, as requested by the guide)
-# ---------------------------------------------------------------------------
+# Valores usados en las estructuras y en el formulario.
 ACCESS_PASSWORD = "Caja"
 
 STACK = "Stack"
@@ -51,7 +35,7 @@ EMPLOYEE = "Employee"
 INDEPENDENT = "Independent"
 EMPLOYMENT_MODES = (EMPLOYEE, INDEPENDENT)
 
-# Spanish labels shown by the graphical interface.
+# Nombres que se muestran en la interfaz.
 STRUCTURE_LABELS = {STACK: "Pila", QUEUE: "Cola", LIST: "Lista"}
 SERVICE_LABELS = {
     UNEMPLOYMENT_SUBSIDY: "Subsidio de desempleo",
@@ -62,9 +46,7 @@ SERVICE_LABELS = {
 }
 EMPLOYMENT_LABELS = {EMPLOYEE: "Empleado", INDEPENDENT: "Independiente"}
 
-# Base fee brackets: (upper bound of the bracket, fee).  The first bracket
-# starts at $ 0 so that the table is always defined; the assignment publishes
-# it from $ 1.000.000 and the application honours the published amounts.
+# Cada par contiene el límite de ingresos y la cuota base correspondiente.
 EMPLOYEE_BRACKETS = (
     (2_000_000, 45_000),
     (3_000_000, 60_000),
@@ -80,8 +62,7 @@ INDEPENDENT_BRACKETS = (
     (None, 80_000),
 )
 
-# Fixed surcharge added to the base fee, except for preventive medicine,
-# whose surcharge is 10 % of the current income.
+# Medicina preventiva se calcula aparte como porcentaje de los ingresos.
 SERVICE_SURCHARGES = {
     UNEMPLOYMENT_SUBSIDY: 0,
     PARK_ADMISSION: 2_500,
@@ -92,11 +73,9 @@ SERVICE_SURCHARGES = {
 DATE_FORMAT = "%d/%m/%Y"
 DATE_PATTERN = "dd/mm/yyyy"
 NAME_PATTERN = re.compile(r"^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$")
+# Errores de validación
 
 
-# ---------------------------------------------------------------------------
-# Exceptions
-# ---------------------------------------------------------------------------
 class DataStructureError(Exception):
     """Base class for the errors raised by the domain model."""
 
@@ -115,11 +94,9 @@ class EmptyStructureError(DataStructureError):
 
 class AffiliateNotFoundError(DataStructureError):
     """Raised when the requested affiliate is not present in the list."""
+# Funciones auxiliares
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 def format_currency(value: int | float) -> str:
     """Return a Colombian peso representation, e.g. 45000 -> '$ 45.000'."""
     try:
@@ -130,11 +107,7 @@ def format_currency(value: int | float) -> str:
 
 
 def parse_income(value: str | int | float) -> int:
-    """Convert user input such as '2.500.000' or '$ 2500000' to an integer.
-
-    Only the digits are kept; this accepts the thousands separators usually
-    typed by Colombian users without allowing negative or decimal amounts.
-    """
+    """Convierte los ingresos ingresados en una cantidad entera."""
     if isinstance(value, bool):
         raise ValidationError("Los ingresos actuales deben ser un valor numérico.")
     if isinstance(value, int):
@@ -217,19 +190,12 @@ def calculate_affiliation_fee(
     else:
         surcharge = SERVICE_SURCHARGES.get(desired_service, 0)
     return int(base_fee + surcharge)
+# Datos del afiliado
 
 
-# ---------------------------------------------------------------------------
-# Domain entities
-# ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class Affiliate:
-    """An affiliate registered in the compensation fund.
-
-    The class stores one complete record; it does not know which data
-    structure contains it.  ``AffiliateDataStructure`` below owns the three
-    linear structures.
-    """
+    """Datos de una persona afiliada a la caja."""
 
     identification_type: str
     identification_number: str
@@ -258,7 +224,6 @@ class Affiliate:
         if not isinstance(self.affiliation_date, date):
             raise ValidationError("La fecha de afiliación no es válida.")
 
-    # -- Presentation helpers -------------------------------------------------
     @property
     def formatted_date(self) -> str:
         return format_date(self.affiliation_date)
@@ -309,22 +274,11 @@ class StructureReport:
     @property
     def formatted_average_income(self) -> str:
         return format_currency(self.average_income)
+# Estructuras lineales
 
 
-# ---------------------------------------------------------------------------
-# Linear data structures
-# ---------------------------------------------------------------------------
 class AffiliateDataStructure:
-    """Manage the affiliates through a stack, a queue and a list.
-
-    * Stack  -> Python ``list`` used with ``append`` / ``pop`` (LIFO).
-    * Queue  -> ``collections.deque`` used with ``append`` / ``popleft`` (FIFO).
-    * List   -> Python ``list`` used with ``append`` and removal by ID.
-
-    ``EstructuraDatosAfiliado`` is kept as an alias because that is the name
-    used by the assignment statement; the implementation follows the English
-    naming convention required by the guide.
-    """
+    """Guarda y consulta afiliados en una pila, una cola y una lista."""
 
     def __init__(self, access_password: str = ACCESS_PASSWORD) -> None:
         self.access_password = access_password
@@ -332,12 +286,10 @@ class AffiliateDataStructure:
         self.queue: deque[Affiliate] = deque()
         self.affiliate_list: list[Affiliate] = []
 
-    # -- Access ---------------------------------------------------------------
     def validate_password(self, password: str) -> bool:
         """Compare the password entered in the login window."""
         return hmac.compare_digest(str(password), str(self.access_password))
 
-    # -- Read -----------------------------------------------------------------
     def _collection(self, structure: str) -> Iterable[Affiliate]:
         if structure == STACK:
             return self.stack
@@ -348,12 +300,8 @@ class AffiliateDataStructure:
         raise ValidationError("Seleccione una estructura de datos válida.")
 
     def records(self, structure: str) -> list[Affiliate]:
-        """Return the records in the order in which the Treeview shows them.
-
-        The stack is shown top-first (the last record appears at the top),
-        the queue is shown front-first and the list keeps the arrival order.
-        """
-        self._collection(structure)  # validates the structure name
+        """Devuelve los registros en el orden en que se muestran."""
+        self._collection(structure)  # Comprueba que la estructura exista
         if structure == STACK:
             return list(reversed(self.stack))
         if structure == QUEUE:
@@ -370,7 +318,6 @@ class AffiliateDataStructure:
                 return affiliate
         return None
 
-    # -- Write ----------------------------------------------------------------
     def register(self, structure: str, affiliate: Affiliate) -> Affiliate:
         """Insert an affiliate using the default behaviour of the structure."""
         self._collection(structure)
@@ -416,7 +363,6 @@ class AffiliateDataStructure:
         self.affiliate_list.remove(affiliate)
         return affiliate
 
-    # -- Reports --------------------------------------------------------------
     def build_report(self, structure: str) -> StructureReport:
         """Build the report required for the selected structure."""
         records = self.records(structure)
@@ -448,7 +394,6 @@ class AffiliateDataStructure:
             f"Promedio de ingresos actuales: {report.formatted_average_income}"
         )
 
-    # -- Convenience ----------------------------------------------------------
     def summary(self) -> dict[str, int]:
         """Return how many records each structure contains."""
         return {
@@ -464,6 +409,5 @@ class AffiliateDataStructure:
         self.affiliate_list.clear()
 
 
-# The statement names the class in Spanish; the alias preserves that contract
-# while the implementation uses the English naming convention.
+# Nombre de la clase usado en el enunciado.
 EstructuraDatosAfiliado = AffiliateDataStructure
